@@ -16,10 +16,16 @@ import discord
 import re
 import requests
 
+import sqlite3
+
 import textwrap
 import aiohttp
+
+import datetime
 from datetime import datetime
 from datetime import date
+from datetime import datetime, timedelta
+
 from bs4 import BeautifulSoup
 from urllib import request
 
@@ -40,6 +46,43 @@ from keep_alive import keep_alive
 
 FINNHUB_API_KEY = os.getenv('FINNHUB_API_KEY')
 ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
+
+conn = sqlite3.connect("bot_data.db")  # This creates the file "bot_data.db" if it doesn't exist
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    balance INTEGER,
+    last_daily_claim TIMESTAMP,
+    last_weekly_claim TIMESTAMP
+)
+""")
+conn.commit()  # Commit the changes
+
+# Get user balance
+def get_balance(user_id):
+    cursor.execute("SELECT balance FROM users WHERE id = ?", (user_id,))
+    result = cursor.fetchone()
+    return result[0] if result else 0
+
+# Update user balance
+def update_balance(user_id, new_balance):
+    cursor.execute("INSERT OR IGNORE INTO users (id, balance) VALUES (?, ?)", (user_id, new_balance))
+    cursor.execute("UPDATE users SET balance = ? WHERE id = ?", (new_balance, user_id))
+    conn.commit()
+
+# Get user claim timestamp
+def get_last_claim(user_id, claim_type):
+    cursor.execute(f"SELECT {claim_type} FROM users WHERE id = ?", (user_id,))
+    result = cursor.fetchone()
+    return result[0] if result else None
+
+# Update user claim timestamp
+def update_last_claim(user_id, claim_type, claim_timestamp):
+    cursor.execute(f"INSERT OR IGNORE INTO users (id, {claim_type}) VALUES (?, ?)", (user_id, claim_timestamp))
+    cursor.execute(f"UPDATE users SET {claim_type} = ? WHERE id = ?", (claim_timestamp, user_id))
+    conn.commit()
 
 newsSources = 'the-verge,the-wall-street-journal,vice-news,wired,politico,next-big-future,new-york-magazine,hacker-news,crypto-coins-news,ars-technica'
 magicalAnswers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes definitely", "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes", "Signs point to yes", "Reply hazy try again", "Ask again later", "Better not tell you now", "Cannot predict now", "Concentrate and ask again", "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful"]
@@ -286,7 +329,6 @@ async def crypto(ctx, *, searchTerm: str):
     embedVar.set_footer(text="This command uses the CoinGecko API", icon_url="https://i.imgur.com/5ceiK2e.png")
 
     await ctx.channel.send(embed=embedVar)
-
 
 @client.command()
 async def ticker(ctx, query: str = None):
@@ -715,6 +757,58 @@ async def on_command_error(ctx, error):
             for i in range(1, len(help_messages[cmd]), 2):
                 embedVar.add_field(name=help_messages[cmd][i], value=help_messages[cmd][i+1])
             await ctx.send(embed=embedVar)
+
+@client.command()
+async def daily(ctx):
+    user_id = ctx.author.id
+    last_daily_claim = get_last_claim(user_id, "last_daily_claim")
+
+    if last_daily_claim and datetime.strptime(last_daily_claim, "%Y-%m-%d %H:%M:%S") + timedelta(days=1) > datetime.utcnow():
+        next_daily = (datetime.strptime(last_daily_claim, "%Y-%m-%d %H:%M:%S") + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+        embedVar = discord.Embed(title="💵 Daily Reward 💵", description="You have already claimed your daily reward!", color=0xf449d3)
+        embedVar.add_field(name="Next:", value=next_daily, inline=False)
+    else:
+        update_balance(user_id, get_balance(user_id) + 1000)
+        update_last_claim(user_id, "last_daily_claim", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+
+        next_daily = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+        embedVar = discord.Embed(title="💵 Daily Reward 💵", description="You have claimed your daily reward!", color=0xf449d3)
+        embedVar.add_field(name="Contains:", value="🧧 1,000", inline=False)
+        embedVar.add_field(name="Available every:", value="24 hours", inline=False)
+        embedVar.add_field(name="Next:", value=next_daily, inline=False)
+
+    await ctx.send(embed=embedVar)
+
+@client.command()
+async def weekly(ctx):
+    user_id = ctx.author.id
+    last_weekly_claim = get_last_claim(user_id, "last_weekly_claim")
+
+    if last_weekly_claim and datetime.strptime(last_weekly_claim, "%Y-%m-%d %H:%M:%S") + timedelta(days=7) > datetime.utcnow():
+        next_weekly = (datetime.strptime(last_weekly_claim, "%Y-%m-%d %H:%M:%S") + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
+        embedVar = discord.Embed(title="💰 Weekly Reward 💰", description="You have already claimed your weekly reward!", color=0xf449d3)
+        embedVar.add_field(name="Next:", value=next_weekly, inline=False)
+    else:
+        update_balance(user_id, get_balance(user_id) + 10000)
+        update_last_claim(user_id, "last_weekly_claim", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
+
+        next_weekly = (datetime.utcnow() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")
+        embedVar = discord.Embed(title="💰 Weekly Reward 💰", description="You have claimed your weekly reward!", color=0xf449d3)
+        embedVar.add_field(name="Contains:", value="🧧 10,000", inline=False)
+        embedVar.add_field(name="Available every:", value="7 days", inline=False)
+        embedVar.add_field(name="Next:", value=next_weekly, inline=False)
+
+    await ctx.send(embed=embedVar)
+
+@client.command()
+async def balance(ctx):
+  user_id = ctx.author.id
+  current_balance = get_balance(user_id)
+  
+  embedVar = discord.Embed(title="💳 Balance 💳", description=f"{ctx.author.mention}, your current balance is:", color=0xf449d3)
+  embedVar.add_field(name="Amount:", value=f"{current_balance}", inline=False)
+  
+  await ctx.send(embed=embedVar)
 
 keep_alive()
 client.run(os.getenv('TOKEN'))
