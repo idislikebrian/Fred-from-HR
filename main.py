@@ -488,36 +488,37 @@ async def gig(ctx, *, description):
         await ctx.send(embed=embedVar)
 
 async def fetch(url, session):
-    async with session.get(url) as response:
-        return await response.text()
+  async with session.get(url) as response:
+    return await response.text()
 
 async def fetch_quote(session):
-    quote_url = "https://zenquotes.io/api/random"
-    async with session.get(quote_url) as response:
-        quote_data = await response.json()
-        return f"{quote_data[0]['q']} - {quote_data[0]['a']}"
+  quote_url = "https://zenquotes.io/api/random"
+  async with session.get(quote_url) as response:
+    quote_data = await response.json()
+    return f"{quote_data[0]['q']} - {quote_data[0]['a']}"
 
 async def fetch_today_in_history(today, session):
-    today_in_history_url = f"https://byabbe.se/on-this-day/{today}/events"
-    async with session.get(today_in_history_url) as response:
-        history_data = await response.json()
-        event = history_data["data"][0]
-        return f"{event['year']}: {event['description']}"
+  month, day = today.split('-')[1:]
+  today_in_history_url = f"https://history.muffinlabs.com/date/{month}/{day}"
+  async with session.get(today_in_history_url) as response:
+    history_data = await response.json()
+    event = history_data["data"]["Events"][0]
+    return f"{event['year']}: {event['text']}"
 
 async def fetch_random_fact(session):
-    fact_url = "https://uselessfacts.jsph.pl/random.json?language=en"
-    async with session.get(fact_url) as response:
-        fact_data = await response.json()
-        return fact_data["text"]
+  fact_url = "https://uselessfacts.jsph.pl/random.json?language=en"
+  async with session.get(fact_url) as response:
+    fact_data = await response.json()
+    return fact_data["text"]
 
 async def fetch_daily_joke(session):
-    joke_url = "https://v2.jokeapi.dev/joke/Any"
-    async with session.get(joke_url) as response:
-        joke_data = await response.json()
-        if joke_data["type"] == "single":
-            return joke_data["joke"]
-        else:
-            return f"{joke_data['setup']} - {joke_data['delivery']}"
+  joke_url = "https://v2.jokeapi.dev/joke/Any"
+  async with session.get(joke_url) as response:
+    joke_data = await response.json()
+    if joke_data["type"] == "single":
+      return joke_data["joke"]
+    else:
+      return f"{joke_data['setup']} - {joke_data['delivery']}"
 
 @client.command()
 async def memo(ctx):
@@ -553,7 +554,7 @@ async def memo(ctx):
         embedVar.add_field(name="**Random Fact**", value=random_fact, inline=False)
         embedVar.add_field(name="**Daily Joke**", value=daily_joke, inline=False)
 
-        channel = discord.utils.get(ctx.guild.channels, id=756345085259677701)  # change channel to general after testing
+        channel = discord.utils.get(ctx.guild.channels, id=708336363757371396)  # change channel to 756345085259677701 for testing
         await channel.send(embed=embedVar)
     else:
         time.sleep(1)
@@ -563,12 +564,12 @@ import asyncio
 from collections import defaultdict
 
 async def countdown(ctx, game_message):
-    await asyncio.sleep(30)
-    embedVar = discord.Embed(title="Cee-lo", description=f"Starting in 30 seconds! [Jump to start]({game_message.jump_url})", color=0xffa500)
-    await ctx.send(embed=embedVar)
-    await asyncio.sleep(15)
-    embedVar = discord.Embed(title="Cee-lo", description=f"Starting in 15 seconds! [Jump to start]({game_message.jump_url})", color=0xff0000)
-    await ctx.send(embed=embedVar)
+  await asyncio.sleep(30)
+  embedVar = discord.Embed(title="Cee-lo", description=f"Starting in 30 seconds! [Jump to start]({game_message.jump_url})", color=0xffa500)
+  await ctx.send(embed=embedVar)
+  await asyncio.sleep(15)
+  embedVar = discord.Embed(title="Cee-lo", description=f"Starting in 15 seconds! [Jump to start]({game_message.jump_url})", color=0xff0000)
+  await ctx.send(embed=embedVar)
   
 # Helper function to determine the roll outcome
 def cee_lo_outcome(roll):
