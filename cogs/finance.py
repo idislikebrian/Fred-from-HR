@@ -11,8 +11,8 @@ FINNHUB_API_KEY = os.getenv('FINNHUB_API_KEY')
 cg = CoinGeckoAPI()
 
 class FinanceCog(commands.Cog):
-  def __init__(self, bot):
-    self.bot = bot
+  def __init__(self, client):
+    self.client = client
 
   def crypto_price(self, searching):
     coin_list = cg.get_coins_list()

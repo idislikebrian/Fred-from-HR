@@ -13,6 +13,8 @@ from setuptools import setup
 
 ## verified imports
 import discord
+from cogs.finance import FinanceCog
+
 import re
 import requests
 
@@ -91,8 +93,9 @@ client = commands.Bot(command_prefix='-', intents=intents)
 
 @client.event
 async def on_ready():
-    print("Fred from HR is clocked in!")
-    await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/17"), afk=False)
+  print("Fred from HR is clocked in!")
+  client.add_cog(FinanceCog(bot))
+  await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/17"), afk=False)
 
 @client.event
 async def on_member_join(member):
