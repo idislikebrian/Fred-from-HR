@@ -115,20 +115,34 @@ async def display_book(ctx, book):
   
   await ctx.send(embed=embedVar)
 
-async def book_search(query):
-  query = query.replace(' ', '+')
-  link = f"https://www.goodreads.com/search?utf8=%E2%9C%93&query={query}"
-  book_page = requests.get(link)
-  extra_data = BeautifulSoup(book_page.content, 'html.parser')
-  element = extra_data.find_all("a", href=True)
+async def search_books(query):
+  search_link = f"https://www.goodreads.com/search?utf8=%E2%9C%93&query={query.replace(' ', '+')}"
+  book_page = requests.get(search_link)
+  soup = BeautifulSoup(book_page.content, 'html.parser')
+  search_results = soup.find_all("a", href=True)
+  book_link = search_results[106]['href']
+  book_url = f"https://www.goodreads.com{book_link}"
+  book_scrub = requests.get(book_url)
+  book_data = BeautifulSoup(book_scrub.content, 'html.parser')
 
-  try:
-    x = element[106]
-    text = x['href']
-    search_result = f"https://www.goodreads.com{text}"
-    return search_result
-  except IndexError:
-    return None
+  title = book_data.find("h1", attrs={"id": "bookTitle"}).text.strip()
+  author = book_data.find("span", attrs={"itemprop": "name"}).text.strip()
+  rating = book_data.find("span", attrs={"itemprop": "ratingValue"}).text.strip()
+  imageURL = book_data.find("img", attrs={"id": "coverImage"})['src']
+  description_element = book_data.find("div", attrs={"id": "description"})
+  description = " ".join(description_element.stripped_strings)[:140]
+  link = book_url
+
+  book = {
+    "title": title,
+    "author": author,
+    "rating": rating,
+    "imageURL": imageURL,
+    "description": description,
+    "link": link,
+  }
+
+  return book
 
 def setup(client):
     client.add_cog(MediaCog(client))
