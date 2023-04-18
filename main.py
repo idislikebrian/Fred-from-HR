@@ -97,7 +97,7 @@ async def on_ready():
   print("Fred from HR is clocked in!")
   client.add_cog(FinanceCog(client))
   client.add_cog(CeeloCog(client))
-  await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/17"), afk=False)
+  await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/18"), afk=False)
 
 @client.event
 async def on_member_join(member):
