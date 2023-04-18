@@ -75,61 +75,61 @@ class FinanceCog(commands.Cog):
 
     try:
       # Get the ticker symbol using the company name or symbol
-      search_url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={ALPHA_VANTAGE_API_KEY}"
+      search_url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={self.ALPHA_VANTAGE_API_KEY}"
       search_response = requests.get(search_url)
       search_data = search_response.json()
 
       if not search_data['bestMatches']:
-          await ctx.channel.send("No matching ticker symbol or company name found.")
-          return
+        await ctx.channel.send("No matching ticker symbol or company name found.")
+        return
 
-        # Filter search results to prioritize US-based stocks
-        search_results = search_data['bestMatches']
-        us_based_results = [result for result in search_results if result['4. region'] == 'United States']
+      # Filter search results to prioritize US-based stocks
+      search_results = search_data['bestMatches']
+      us_based_results = [result for result in search_results if result['4. region'] == 'United States']
 
-        if us_based_results:
-            best_match = us_based_results[0]
-            alternative_matches = us_based_results[1:4]
-        else:
-            best_match = search_results[0]
-            alternative_matches = search_results[1:4]
+      if us_based_results:
+        best_match = us_based_results[0]
+        alternative_matches = us_based_results[1:4]
+      else:
+        best_match = search_results[0]
+        alternative_matches = search_results[1:4]
 
-        ticker = best_match['1. symbol']
-        company_name = best_match['2. name']
+      ticker = best_match['1. symbol']
+      company_name = best_match['2. name']
 
-        # Fetch stock data from Finnhub API
-        api_url = f"https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_API_KEY}"
-        api_response = requests.get(api_url)
-        stock_data = api_response.json()
+      # Fetch stock data from Finnhub API
+      api_url = f"https://finnhub.io/api/v1/quote?symbol={ticker}&token={self.FINNHUB_API_KEY}"
+      api_response = requests.get(api_url)
+      stock_data = api_response.json()
 
-        # Extract and format data
-        price = stock_data.get("c")
-        change = stock_data.get("d")
-        changePercent = stock_data.get("dp")
+      # Extract and format data
+      price = stock_data.get("c")
+      change = stock_data.get("d")
+      changePercent = stock_data.get("dp")
 
-        # Check if the data is missing
-        if price is None:
-            await ctx.channel.send("The current stock price is unavailable. Please try again later.")
-            return
+      # Check if the data is missing
+      if price is None:
+        await ctx.channel.send("The current stock price is unavailable. Please try again later.")
+        return
 
-        if change is None or changePercent is None:
-            await ctx.channel.send(f"The current stock price for {company_name} (${ticker}) is ${price}. Change data is unavailable.")
-            return
+      if change is None or changePercent is None:
+        await ctx.channel.send(f"The current stock price for {company_name} (${ticker}) is ${price}. Change data is unavailable.")
+        return
 
-        percentage = "{:.2f}%".format(changePercent)
-        statementsChange = "${} / {}".format(change, percentage)
+      percentage = "{:.2f}%".format(changePercent)
+      statementsChange = "${} / {}".format(change, percentage)
 
-        # Create and send embed message
-        embedVar = discord.Embed(title=f"{company_name} (${ticker})", description=f"The current stock price is ${price}", color=0x85bb65)
-        embedVar.add_field(name="24h Change [Price(USD) / Percent]", value=statementsChange)
-        await ctx.channel.send(embed=embedVar)
+      # Create and send embed message
+      embedVar = discord.Embed(title=f"{company_name} (${ticker})", description=f"The current stock price is ${price}", color=0x85bb65)
+      embedVar.add_field(name="24h Change [Price(USD) / Percent]", value=statementsChange)
+      await ctx.channel.send(embed=embedVar)
 
-        # Send alternative results
-        if alternative_matches:
-            time.sleep(1)
-            alternatives_text = "\n".join([f"{result['2. name']} (${result['1. symbol']})" for result in alternative_matches])
-            await ctx.channel.send(f"**Alternative results:**\n{alternatives_text}")
+      # Send alternative results
+      if alternative_matches:
+        time.sleep(1)
+        alternatives_text = "\n".join([f"{result['2. name']} (${result['1. symbol']})" for result in alternative_matches])
+        await ctx.channel.send(f"**Alternative results:**\n{alternatives_text}")
 
     except Exception as e:
-        print(f"Error fetching stock data for {query}: {e}")
-        await ctx.channel.send("There was an error fetching the stock data. Please try again.")
+      print(f"Error fetching stock data for {query}: {e}")
+      await ctx.channel.send("There was an error fetching the stock data. Please try again.")

@@ -14,6 +14,7 @@ from setuptools import setup
 ## verified imports
 import discord
 from cogs.finance import FinanceCog
+from cogs.ceelo import CeeloCog
 
 import re
 import requests
@@ -94,7 +95,8 @@ client = commands.Bot(command_prefix='-', intents=intents)
 @client.event
 async def on_ready():
   print("Fred from HR is clocked in!")
-  client.add_cog(FinanceCog(bot))
+  client.add_cog(FinanceCog(client))
+  client.add_cog(CeeloCog(client))
   await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/17"), afk=False)
 
 @client.event
@@ -478,126 +480,6 @@ async def memo(ctx):
     else:
         time.sleep(1)
         await ctx.send("Only a <@&709389579651645502> can use this command.")
-
-import asyncio
-from collections import defaultdict
-
-async def countdown(ctx, game_message):
-  await asyncio.sleep(30)
-  embedVar = discord.Embed(title="Cee-lo", description=f"Starting in 30 seconds! [Jump to start]({game_message.jump_url})", color=0xffa500)
-  await ctx.send(embed=embedVar)
-  await asyncio.sleep(15)
-  embedVar = discord.Embed(title="Cee-lo", description=f"Starting in 15 seconds! [Jump to start]({game_message.jump_url})", color=0xff0000)
-  await ctx.send(embed=embedVar)
-  
-# Helper function to determine the roll outcome
-def cee_lo_outcome(roll):
-  roll.sort()
-  if roll[0] == roll[1] == roll[2]:
-    return ('Triple', roll[0])
-  elif roll == [1, 2, 3]:
-    return ('Automatic Loss', None)
-  elif roll == [4, 5, 6]:
-    return ('Automatic Win', None)
-  elif roll[0] == roll[1]:
-    return ('Point', roll[2])
-  elif roll[1] == roll[2]:
-    return ('Point', roll[0])
-  else:
-    return ('No Point', None)
-
-active_games = defaultdict(lambda: {'players': set(), 'game_running': False})
-
-@client.command()
-async def roll(ctx):
-  # Restrict the command to the specific channel
-  allowed_channel_id = 814947576297160746
-  if ctx.channel.id != allowed_channel_id:
-      embedVar = discord.Embed(title="Cee-lo", description="Let's keep the game in the  <#814947576297160746> channel :wink:", color=0xf449d3)
-      await ctx.send(embed=embedVar)
-      return
-
-  channel = ctx.channel
-  if active_games[channel]['game_running']:
-        embedVar = discord.Embed(title="Cee-lo", description="A game is already in progress.", color=0xf449d3)
-        await ctx.send(embed=embedVar)
-        return
-
-  active_games[channel]['game_running'] = True
-  embedVar = discord.Embed(title=f"A game of Cee-lo hosted by {ctx.author.name}", description="A new Cee-lo game is about to start in 60 seconds, please react with 🎲 to participate in this round.", color=0xf449d3)
-  game_message = await ctx.send(embed=embedVar)
-  await game_message.add_reaction("🎲")
-
-  def check(reaction, user):
-      return user != client.user and str(reaction.emoji) == "🎲"
-
-  countdown_task = asyncio.create_task(countdown(ctx, game_message))
-
-  while True:
-    try:
-      reaction, user = await client.wait_for("reaction_add", timeout=60, check=check)
-      if user not in active_games[channel]['players']:
-        active_games[channel]['players'].add(user)
-    except asyncio.TimeoutError:
-      break
-
-    countdown_task.cancel()
-
-  # Check if there are at least two players
-    if not active_games[channel]['players'] or len(active_games[channel]['players']) < 2:
-        embedVar = discord.Embed(title="Cee-lo", description=f"No one wanted the smoke from {ctx.author.mention}. Ending the game.", color=0xf449d3)
-        await ctx.send(embed=embedVar)
-        active_games[channel]['game_running'] = False
-        return
-
-    participant_mentions = ", ".join([player.mention for player in active_games[channel]['players']])
-    embedVar = discord.Embed(title="Started a new game of Cee-lo", description=f"Number of participants: {len(active_games[channel]['players'])}", color=0xf449d3)
-    embedVar.add_field(name="Participants", value=participant_mentions, inline=False)
-    await ctx.send(embed=embedVar)
-    await asyncio.sleep(2)
-
-    winner = None
-    max_rank = -1
-
-    for player in active_games[channel]['players']:
-        outcome = 'No Point'
-        while outcome == 'No Point':
-            roll = [random.randint(1, 6) for _ in range(3)]
-            outcome, point = cee_lo_outcome(roll)
-
-        embedVar = discord.Embed(title="Cee-lo", description=f"{player.mention} rolled:", color=0xf449d3)
-        embedVar.add_field(name="🎲", value=f"{roll[0]}, {roll[1]}, {roll[2]} ({outcome})", inline=False)
-        await channel.send(embed=embedVar)
-        await asyncio.sleep(2)
-
-        # Check for automatic win
-        if outcome == "Automatic Win":
-            winner = player
-            embedVar = discord.Embed(title="Cee-lo", description=f"🎉 {winner.mention} wins the game with an Automatic Win! 🎉", color=0xffff00)
-            await ctx.send(embed=embedVar)
-            active_games[channel]['game_running'] = False
-            return
-
-        rank = 0
-        if outcome == "Triple":
-            rank = 10 + point
-        elif outcome == "Point":
-            rank = point
-
-        if rank > max_rank:
-            max_rank = rank
-            winner = player
-
-        # Check for automatic loss
-    if max_rank == 0:
-        embedVar = discord.Embed(title="Cee-lo", description="All players rolled an Automatic Loss. There is no winner.", color=0xf449d3)
-        await ctx.send(embed=embedVar)
-    else:
-        await asyncio.sleep(2)
-        embedVar = discord.Embed(title="Cee-lo", description=f"🎉 {winner.mention} wins the game with {max_rank} points! 🎉", color=0xffff00)
-        await ctx.send(embed=embedVar)
-
-    active_games[channel]['game_running'] = False
   
 @client.event
 async def on_command_error(ctx, error):
