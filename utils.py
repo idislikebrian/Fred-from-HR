@@ -1,0 +1,1 @@
+notFriends = ["buddy", "pal", "friend", "chief", "ace", "br0", "guy"]

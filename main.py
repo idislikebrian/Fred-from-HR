@@ -15,6 +15,9 @@ from setuptools import setup
 import discord
 from cogs.finance import FinanceCog
 from cogs.ceelo import CeeloCog
+from cogs.media import MediaCog
+
+from utils import notFriends
 
 import re
 import requests
@@ -31,9 +34,6 @@ from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
 from urllib import request
-
-import tmdbsimple as tmdb
-tmdb.API_KEY = os.getenv('tmdb.API_KEY')
 
 from discord.ext import tasks
 from discord.ext import commands
@@ -86,7 +86,7 @@ magicalAnswers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes
 ceremonies = ["The Flying Spaghetti Monster", "the Illuminati", "a local school district", "a giant squid", "the devil", "get the iPhone X", "cure cancer", "Dictator Advaith"]
 handshakes = ["https://media.tenor.com/images/180cdc8c0939a00e3674e7eeaf9056a3/tenor.gif", "https://media.tenor.com/images/67e822adc41a34c44c66b998109cd92b/tenor.gif", "https://media1.tenor.com/images/44830011193e0398e7464ed9a86a3643/tenor.gif", "https://media.tenor.com/images/08469d2b5bfbe6cfbdea49dd40ae6a08/tenor.gif", "https://media.tenor.com/images/fc9526c4dc48bce72a0639b29711d59c/tenor.gif", "https://media0.giphy.com/media/l1IYhmLyuCfgPL16g/giphy.gif", "https://media1.tenor.com/images/99af662eae886bacc009163ba3150168/tenor.gif?itemid=3846347", "https://media1.tenor.com/images/73b5c90fc5d2400300292ea8027225c2/tenor.gif?itemid=3400269"]
 matches = ["10%. Your love isn't much.", "20%. Getting better!", "30%. A third of the way to true love.", "40%. Your love is getting great!", "50%. Halfway love!", "65%. I ship it!", "85%. The ship is sailing!", "100%. True love!" "69%. LOL best love!", "200%. You two should be married!"]
-notFriends = ["buddy", "pal", "friend", "chief", "ace", "br0", "guy"]
+
 deathmatches = ["`-coinflip`", "typeracer.com", "**One round** of <#814947576297160746>. (*Must be in that channel*)", "**Insults**", "`-roulette`"]
 rouletteGIFS = ["https://tenor.com/t0pl.gif", "https://tenor.com/oGy9.gif", "https://tenor.com/umUQ.gif"]
 
@@ -97,6 +97,7 @@ async def on_ready():
   print("Fred from HR is clocked in!")
   client.add_cog(FinanceCog(client))
   client.add_cog(CeeloCog(client))
+  client.add_cog(MediaCog(client))
   await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/18"), afk=False)
 
 @client.event
@@ -275,113 +276,6 @@ async def verify(ctx, member: discord.Member):
     # Add the role to the member
     await member.add_roles(verified_role)
     await ctx.send(f"{member.mention} has been verified.")
-
-@client.command()
-async def movie(ctx, *, theMovie):
-    search = tmdb.Search()
-    response = search.movie(query=theMovie)
-
-    if not search.results:
-        not_friend = random.choice(notFriends)
-        await ctx.send(f"Movie not found, {not_friend}")
-        return
-
-    s = search.results[0]
-
-    image = s.get('poster_path')
-    imageURL = f"https://image.tmdb.org/t/p/w300_and_h450_bestv2{image}"
-    
-    release = datetime.strptime(s['release_date'], "%Y-%m-%d")
-    tmdbID = s['id']
-
-    movie = tmdb.Movies(tmdbID)
-    movie_info = movie.info()
-    movie_credits = movie.credits()
-
-    director = ', '.join([
-        crew_member['name']
-        for crew_member in movie_credits['crew']
-        if crew_member['job'] == 'Director'
-    ])
-
-    genres = ', '.join([genre["name"] for genre in movie_info["genres"]])
-
-    runtime = movie_info["runtime"]
-    hours, minutes = divmod(runtime, 60)
-    hours_plural = "hour" if hours == 1 else "hours"
-    minutes_plural = "minute" if minutes == 1 else "minutes"
-    time = f"{hours} {hours_plural} and {minutes} {minutes_plural}"
-
-    budget_currency = "${:,.2f}".format(movie_info["budget"])
-
-    director_label = "Director" if len(director.split(', ')) == 1 else "Directors"
-
-    embedVar = discord.Embed(
-        title=f"{s['title']} ({release.year})",
-        description=textwrap.dedent(f"""\
-            {s['overview']}
-            (Budget: {budget_currency})
-        """),
-        color=0x507fff
-    )
-
-    embedVar.set_thumbnail(url=imageURL)
-    embedVar.add_field(name="Rating", value=f"{s['vote_average']} (out of 10)", inline=True)
-    embedVar.add_field(name="Language", value=s['original_language'])
-    embedVar.add_field(name=director_label, value=director)
-    embedVar.add_field(name="Genres", value=genres)
-    embedVar.add_field(name="Runtime", value=time)
-    embedVar.set_footer(text='This data is pulled from TMDb.com')
-
-    await ctx.send(embed=embedVar)
-
-@client.command()
-@commands.cooldown(1, 5, commands.BucketType.member)
-async def book(ctx, *, theBook):
-    await ctx.send("Give me a second to search all the libraries in the world...")
-    poss = random.randint(0, len(notFriends))
-    friend = notFriends[poss]
-    try:
-        d = ''
-        for x in theBook:
-            if x == ' ':
-                d += '+'
-            else:
-                d += x
-        link = "https://www.goodreads.com/search?utf8=%E2%9C%93&query=" + d
-        bookPage = requests.get(link)
-        extraData = BeautifulSoup(bookPage.content, 'html.parser')
-        element = extraData.find_all("a", href=True)
-        x = element[106]
-        text = x['href']
-        searchResult = "https://www.goodreads.com{}".format(text)
-        bookScrub = requests.get(searchResult)
-        bookData = BeautifulSoup(bookScrub.content, 'html.parser')
-        element1 = bookData.find("div", attrs={"id":"description"})
-        bookTitle = (bookData.find("h1", attrs={"id":"bookTitle"})).text
-        bookAuthor = (bookData.find("span", attrs={"itemprop":"name"})).text
-        rating = (bookData.find("span", attrs={"itemprop": "ratingValue"})).text
-        imageURL = bookData.find("img", attrs={"id": "coverImage"})['src']
-        d = element1.text
-        print(d)
-        c = ''
-        counter = 0
-        while counter < 140:
-            try:
-                c += d[counter]
-            except:
-                pass
-            counter += 1
-        print(c)
-        c += "..."
-        embedVar = discord.Embed(title=bookTitle, description="by " + bookAuthor, color=0x507fff)
-        embedVar.set_thumbnail(url=imageURL)
-        embedVar.add_field(name="Overview", value=c + " [Read more]({})".format(searchResult), inline=True)
-        embedVar.add_field(name="Rating", value=rating, inline=True)
-        embedVar.set_footer(text='This data is pulled from Goodreads.com')
-        await ctx.send(embed=embedVar)
-    except:
-        await ctx.send("That's not a book, " + friend)
 
 @client.command()
 @commands.cooldown(1, 10, commands.BucketType.member)
