@@ -1,7 +1,10 @@
-import random
 import discord
 from discord.ext import commands
+from typing import Union
+
 import asyncio
+import random
+
 from utils import matches, magicalAnswers, ceremonies, handshakes, rouletteGIFS, deathmatches
 
 class FunCog(commands.Cog):
@@ -9,10 +12,27 @@ class FunCog(commands.Cog):
     self.client = client
       
   @commands.command(name='flip', aliases=['coin', 'coinflip'])
-  async def cointoss(ctx):
-    coinSide = ['Heads', 'Tails']
-    await ctx.channel.send(random.choice(coinSide))
-  
+  async def cointoss(self, ctx, member_or_prediction: Union[discord.Member, str] = None):
+    coin_sides = ['heads', 'tails']
+    result = random.choice(coin_sides)
+    
+    if member_or_prediction is None:
+        await ctx.send(f"{ctx.author.mention}, the coin landed on {result.capitalize()}!")
+    elif isinstance(member_or_prediction, discord.Member):
+        member = member_or_prediction
+        await ctx.send(f"{member.mention}, the coin landed on {result.capitalize()}!")
+    else:
+        prediction = member_or_prediction.lower()
+        if prediction not in coin_sides:
+            await ctx.send(f"{ctx.author.mention}, that's an invalid prediction. Please use 'heads' or 'tails'.")
+        else:
+            is_correct = prediction == result
+            if is_correct:
+                await ctx.send(f"{ctx.author.mention}, your prediction was correct! The coin landed on {result.capitalize()}!")
+            else:
+                await ctx.send(f"{ctx.author.mention}, your prediction was incorrect. The coin landed on {result.capitalize()}.")
+
+
   @commands.command()
   async def magic8(self, ctx, *, inquiry: str):
     await asyncio.sleep(2)
@@ -63,30 +83,28 @@ class FunCog(commands.Cog):
       await ctx.message.delete()
   
   @commands.command()
-  async def deathmatch(ctx, member : discord.Member):
-      challenger = ctx.author.id
-      challengee = member.mention
-      challenge = random.randint(0, 4)
-      statement = "<@{}> has challenged {} to a deathmatch. The trial will be {}.".format(challenger,challengee,deathmatches[challenge])
-      embedVar = discord.Embed(title=" ", description=statement)
-      await ctx.send(embed=embedVar)
-      await asyncio.sleep(3)
-      await ctx.message.delete()
+  async def deathmatch(self, ctx, member: discord.Member):
+    challenger = ctx.author.id
+    challengee = member.mention
+    challenge = random.choice(deathmatches)
+    statement = f"<@{challenger}> has challenged {challengee} to a deathmatch. The trial will be {challenge}."
+    embedVar = discord.Embed(title=" ", description=statement)
+    await ctx.send(embed=embedVar)
   
   @commands.command()
-  async def roulette(ctx):
-      embedLoading = discord.Embed(title=" ", description="Loading...")
-      embedLoading.set_image(url="https://media1.tenor.com/images/69be09d0b37d5c4541bb2a01805ffabc/tenor.gif")
-      await ctx.send(embed=embedLoading)
-      user = ctx.author.id
-      visual = random.randint(0, 2)
-      choice = random.randint(1, 6)
+  async def roulette(self, ctx):
+    embedLoading = discord.Embed(title=" ", description="Loading...")
+    embedLoading.set_image(url="https://media1.tenor.com/images/69be09d0b37d5c4541bb2a01805ffabc/tenor.gif")
+    await ctx.send(embed=embedLoading)
+    user = ctx.author.id
+    visual = random.choice(rouletteGIFS)
+    choice = random.randint(1, 6)
+    await asyncio.sleep(2)
+    if choice > 1:
+      embedVar = discord.Embed(title=" ", description=f"😰 <@{user}>, you survived... This time.")
+      await ctx.send(embed=embedVar)
+    else:
+      await ctx.send(visual)
       await asyncio.sleep(2)
-      if choice > 1:
-          embedVar = discord.Embed(title=" ", description="😰 <@{}>, you survived... This time.".format(user))
-          await ctx.send(embed=embedVar)
-      else:
-          await ctx.send(rouletteGIFS[visual])
-          await asyncio.sleep(2)
-          embedVar = discord.Embed(title=" ", description="**BANG!** ⚰ <@{}> died. RIP.".format(user))
-          await ctx.send(embed=embedVar)
+      embedVar = discord.Embed(title=" ", description=f"**BANG!** ⚰ <@{user}> died. RIP.")
+      await ctx.send(embed=embedVar)
