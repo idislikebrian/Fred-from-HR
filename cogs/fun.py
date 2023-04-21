@@ -1,0 +1,92 @@
+import random
+import discord
+from discord.ext import commands
+import asyncio
+from utils import matches, magicalAnswers, ceremonies, handshakes, rouletteGIFS, deathmatches
+
+class FunCog(commands.Cog):
+  def __init__(self, client):
+    self.client = client
+      
+  @commands.command(name='flip', aliases=['coin', 'coinflip'])
+  async def cointoss(ctx):
+    coinSide = ['Heads', 'Tails']
+    await ctx.channel.send(random.choice(coinSide))
+  
+  @commands.command()
+  async def magic8(self, ctx, *, inquiry: str):
+    await asyncio.sleep(2)
+    channel = ctx.channel
+    inquirer_mention = ctx.author.mention
+    inquiry_statement = f"Q: {inquiry}"
+    choice = random.choice(magicalAnswers)
+    embed_var = discord.Embed(title=":8ball: Magic 8 Ball", description=inquirer_mention, color=0xf449d3)
+    embed_var.add_field(name=inquiry_statement, value="A: " + choice)
+    await channel.send(embed=embed_var)
+  
+  @commands.command()
+  async def sacrifice(self, ctx, member: discord.Member):
+    channel = ctx.channel
+    lamb = member.mention
+    person_mention = ctx.author.mention
+    ceremony = random.choice(ceremonies)
+    embed_var = discord.Embed(title=" ", description=f"{person_mention} has sacrificed {lamb} to {ceremony}", color=0xf449d3)
+    await channel.send(embed=embed_var)
+    await ctx.message.delete()
+  
+  @commands.command()
+  async def handshake(self, ctx, member: discord.Member):
+    person1 = ctx.author.id
+    person2 = member.mention
+    ceremony = f"<@{person1}> shook hands with {person2}"
+    handshake_image = random.choice(handshakes)
+    embed_var = discord.Embed(title=" ", description=ceremony, color=0xf449d3)
+    embed_var.set_image(url=handshake_image)
+    await ctx.send(embed=embed_var)
+    await ctx.message.delete()
+  
+  @commands.command()
+  async def match(self, ctx, member: discord.Member):
+    person1 = ctx.author.id
+    person2 = member.mention
+    love_result = random.choice(matches)
+    how_much = f"The love between <@{person1}> and {person2} is {love_result} Keep expressing your love to each other, and that could change!"
+    await ctx.send(how_much)
+  
+  @commands.command()
+  async def hug(ctx, member: discord.Member):
+      person1 = ctx.author.mention
+      person2 = member.mention
+      statement = f"{person1} hugged {person2} ♥"
+      embedVar = discord.Embed(title=" ", description=statement)
+      await ctx.send(embed=embedVar)
+      await ctx.message.delete()
+  
+  @commands.command()
+  async def deathmatch(ctx, member : discord.Member):
+      challenger = ctx.author.id
+      challengee = member.mention
+      challenge = random.randint(0, 4)
+      statement = "<@{}> has challenged {} to a deathmatch. The trial will be {}.".format(challenger,challengee,deathmatches[challenge])
+      embedVar = discord.Embed(title=" ", description=statement)
+      await ctx.send(embed=embedVar)
+      await asyncio.sleep(3)
+      await ctx.message.delete()
+  
+  @commands.command()
+  async def roulette(ctx):
+      embedLoading = discord.Embed(title=" ", description="Loading...")
+      embedLoading.set_image(url="https://media1.tenor.com/images/69be09d0b37d5c4541bb2a01805ffabc/tenor.gif")
+      await ctx.send(embed=embedLoading)
+      user = ctx.author.id
+      visual = random.randint(0, 2)
+      choice = random.randint(1, 6)
+      await asyncio.sleep(2)
+      if choice > 1:
+          embedVar = discord.Embed(title=" ", description="😰 <@{}>, you survived... This time.".format(user))
+          await ctx.send(embed=embedVar)
+      else:
+          await ctx.send(rouletteGIFS[visual])
+          await asyncio.sleep(2)
+          embedVar = discord.Embed(title=" ", description="**BANG!** ⚰ <@{}> died. RIP.".format(user))
+          await ctx.send(embed=embedVar)

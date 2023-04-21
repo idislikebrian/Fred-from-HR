@@ -16,6 +16,7 @@ import discord
 from cogs.finance import FinanceCog
 from cogs.ceelo import CeeloCog
 from cogs.media import MediaCog
+from cogs.fun import FunCog
 
 from utils import notFriends
 
@@ -82,13 +83,7 @@ def update_last_claim(user_id, claim_type, claim_timestamp):
     conn.commit()
 
 newsSources = 'the-verge,the-wall-street-journal,vice-news,wired,politico,next-big-future,new-york-magazine,hacker-news,crypto-coins-news,ars-technica'
-magicalAnswers = ["It is certain", "It is decidedly so", "Without a doubt", "Yes definitely", "You may rely on it", "As I see it, yes", "Most likely", "Outlook good", "Yes", "Signs point to yes", "Reply hazy try again", "Ask again later", "Better not tell you now", "Cannot predict now", "Concentrate and ask again", "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful"]
-ceremonies = ["The Flying Spaghetti Monster", "the Illuminati", "a local school district", "a giant squid", "the devil", "get the iPhone X", "cure cancer", "Dictator Advaith"]
-handshakes = ["https://media.tenor.com/images/180cdc8c0939a00e3674e7eeaf9056a3/tenor.gif", "https://media.tenor.com/images/67e822adc41a34c44c66b998109cd92b/tenor.gif", "https://media1.tenor.com/images/44830011193e0398e7464ed9a86a3643/tenor.gif", "https://media.tenor.com/images/08469d2b5bfbe6cfbdea49dd40ae6a08/tenor.gif", "https://media.tenor.com/images/fc9526c4dc48bce72a0639b29711d59c/tenor.gif", "https://media0.giphy.com/media/l1IYhmLyuCfgPL16g/giphy.gif", "https://media1.tenor.com/images/99af662eae886bacc009163ba3150168/tenor.gif?itemid=3846347", "https://media1.tenor.com/images/73b5c90fc5d2400300292ea8027225c2/tenor.gif?itemid=3400269"]
-matches = ["10%. Your love isn't much.", "20%. Getting better!", "30%. A third of the way to true love.", "40%. Your love is getting great!", "50%. Halfway love!", "65%. I ship it!", "85%. The ship is sailing!", "100%. True love!" "69%. LOL best love!", "200%. You two should be married!"]
 
-deathmatches = ["`-coinflip`", "typeracer.com", "**One round** of <#814947576297160746>. (*Must be in that channel*)", "**Insults**", "`-roulette`"]
-rouletteGIFS = ["https://tenor.com/t0pl.gif", "https://tenor.com/oGy9.gif", "https://tenor.com/umUQ.gif"]
 
 client = commands.Bot(command_prefix='-', intents=intents)
 
@@ -98,6 +93,7 @@ async def on_ready():
   client.add_cog(FinanceCog(client))
   client.add_cog(CeeloCog(client))
   client.add_cog(MediaCog(client))
+  client.add_cog(FunCog(client))
   await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/18"), afk=False)
 
 @client.event
@@ -164,96 +160,6 @@ async def on_raw_reaction_add(payload):
 @client.command()
 async def ping(ctx):
     await ctx.channel.send("To that, I say pong!")
-
-@client.command(name='flip', aliases=['coin', 'coinflip'])
-async def cointoss(ctx):
-    coinSide = ['Heads', 'Tails']
-    await ctx.channel.send(random.choice(coinSide))
-
-@client.command()
-async def magic8(ctx):
-    inquiry = ctx.message.content
-    actualInquiry = inquiry.split("magic8 ")
-    channel = ctx.channel
-    inquirerMention = ctx.message.author.mention
-    inquiryStatement="Q: {}".format(actualInquiry[1])
-    choice = random.randint(0, len(magicalAnswers))
-    declaration = magicalAnswers[choice]
-    embedVar = discord.Embed(title=":8ball: Magic 8 Ball", description=inquirerMention, color=0xf449d3)
-    embedVar.add_field(name=inquiryStatement, value="A: " + declaration)
-    await channel.send(embed=embedVar)
-    ## await ctx.message.delete()
-
-@client.command()
-async def sacrifice(ctx, member: discord.Member):
-    channel = ctx.channel
-    person = ctx.message.author.id
-    lamb = member.mention
-    personMention = ctx.message.author.mention
-    message = random.randint(0, len(ceremonies))
-    ceremony = ceremonies[message]
-    embedVar = discord.Embed(title=" ", description="{} has sacrificed {} to {}".format(personMention, lamb, ceremony), color=0xf449d3)
-    await channel.send(embed=embedVar)
-    await ctx.message.delete()
-
-@client.command()
-async def handshake(ctx,member : discord.Member):
-    person1 = ctx.author.id
-    person2 = member.mention
-    message = random.randint(0,len(handshakes))
-    ceremony = "<@{}> shook hands with {}".format(person1, person2)
-    embedVar = discord.Embed(title=" ", description=ceremony, color=0xf449d3)
-    embedVar.set_image(url=handshakes[message])
-    await ctx.send(embed=embedVar)
-    await ctx.message.delete()
-
-@client.command()
-async def match(ctx, member : discord.Member):
-    person1 = ctx.author.id
-    person2 = member.mention
-    loveChoice = random.randint(0,len(matches))
-    loveResult = matches[loveChoice]
-    howMuch = "The love between <@{}> and {} is {} Keep expressing your love to each other and that could change!".format(person1, person2, loveResult)
-    await ctx.send(howMuch)
-
-@client.command()
-async def hug(ctx, member: discord.Member):
-    person1 = ctx.author.mention
-    person2 = member.mention
-    statement = f"{person1} hugged {person2} ♥"
-
-    embedVar = discord.Embed(title=" ", description=statement)
-    await ctx.send(embed=embedVar)
-    await ctx.message.delete()
-
-@client.command()
-async def deathmatch(ctx, member : discord.Member):
-    challenger = ctx.author.id
-    challengee = member.mention
-    challenge = random.randint(0, 4)
-    statement = "<@{}> has challenged {} to a deathmatch. The trial will be {}.".format(challenger,challengee,deathmatches[challenge])
-    embedVar = discord.Embed(title=" ", description=statement)
-    await ctx.send(embed=embedVar)
-    time.sleep(3)
-    await ctx.message.delete()
-
-@client.command()
-async def roulette(ctx):
-    embedLoading = discord.Embed(title=" ", description="Loading...")
-    embedLoading.set_image(url="https://media1.tenor.com/images/69be09d0b37d5c4541bb2a01805ffabc/tenor.gif")
-    await ctx.send(embed=embedLoading)
-    user = ctx.author.id
-    visual = random.randint(0, 2)
-    choice = random.randint(1, 6)
-    time.sleep(2)
-    if choice > 1:
-        embedVar = discord.Embed(title=" ", description="😰 <@{}>, you survived... This time.".format(user))
-        await ctx.send(embed=embedVar)
-    else:
-        await ctx.send(rouletteGIFS[visual])
-        time.sleep(2)
-        embedVar = discord.Embed(title=" ", description="**BANG!** ⚰ <@{}> died. RIP.".format(user))
-        await ctx.send(embed=embedVar)
 
 @client.command()
 async def verify(ctx, member: discord.Member):

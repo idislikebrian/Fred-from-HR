@@ -32,7 +32,7 @@ class MediaCog(commands.Cog):
   @commands.cooldown(1, 5, commands.BucketType.member)
   async def book(self, ctx, *, theBook):
     await ctx.send("Give me a second to search all the libraries in the world...")
-    search_results = await book_search(theBook)
+    search_results = await search_books(theBook)
 
     if not search_results:
       not_friend = random.choice(notFriends)
@@ -116,33 +116,35 @@ async def display_book(ctx, book):
   await ctx.send(embed=embedVar)
 
 async def search_books(query):
-  search_link = f"https://www.goodreads.com/search?utf8=%E2%9C%93&query={query.replace(' ', '+')}"
-  book_page = requests.get(search_link)
-  soup = BeautifulSoup(book_page.content, 'html.parser')
-  search_results = soup.find_all("a", href=True)
-  book_link = search_results[106]['href']
-  book_url = f"https://www.goodreads.com{book_link}"
-  book_scrub = requests.get(book_url)
-  book_data = BeautifulSoup(book_scrub.content, 'html.parser')
+  url = f'http://openlibrary.org/search.json?q={query}'
+  response = requests.get(url)
+  
+  if response.status_code != 200:
+    return None
 
-  title = book_data.find("h1", attrs={"id": "bookTitle"}).text.strip()
-  author = book_data.find("span", attrs={"itemprop": "name"}).text.strip()
-  rating = book_data.find("span", attrs={"itemprop": "ratingValue"}).text.strip()
-  imageURL = book_data.find("img", attrs={"id": "coverImage"})['src']
-  description_element = book_data.find("div", attrs={"id": "description"})
-  description = " ".join(description_element.stripped_strings)[:140]
-  link = book_url
+  search_data = response.json()
 
-  book = {
-    "title": title,
-    "author": author,
-    "rating": rating,
-    "imageURL": imageURL,
-    "description": description,
-    "link": link,
+  if not search_data or 'docs' not in search_data or not search_data['docs']:
+    return None
+
+  book = search_data['docs'][0]
+
+  title = book.get('title', 'Title not found')
+  author_name = book.get('author_name', ['Author not found'])[0]
+  first_publish_year = book.get('first_publish_year', 'Unknown')
+  cover_i = book.get('cover_i', '')
+
+  if cover_i:
+    image_url = f'http://covers.openlibrary.org/b/id/{cover_i}-M.jpg'
+  else:
+    image_url = ''
+
+  return {
+    'title': title,
+    'author': author_name,
+    'year': first_publish_year,
+    'image_url': image_url
   }
-
-  return book
 
 def setup(client):
     client.add_cog(MediaCog(client))
