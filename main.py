@@ -7,10 +7,6 @@ import json
 import posixpath
 import time
 
-import pytz
-
-from setuptools import setup
-
 ## verified imports
 import discord
 from cogs.finance import FinanceCog
@@ -84,7 +80,6 @@ def update_last_claim(user_id, claim_type, claim_timestamp):
 
 newsSources = 'the-verge,the-wall-street-journal,vice-news,wired,politico,next-big-future,new-york-magazine,hacker-news,crypto-coins-news,ars-technica'
 
-
 client = commands.Bot(command_prefix='-', intents=intents)
 
 @client.event
@@ -119,29 +114,19 @@ async def on_raw_reaction_add(payload):
     if message == 808727603808174121:
         guild_id = payload.guild_id
         guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-        if payload.emoji.name == '🎟️':
-            role = discord.utils.get(guild.roles, name="Legion Chef")
-            member = payload.member
-
-            if member is not None:
-                await member.add_roles(role)
-        print(payload.emoji.name)
         if payload.emoji.name == '🎮':
             role = discord.utils.get(guild.roles, name="Playfellow")
             member = payload.member
-
             if member is not None:
                 await member.add_roles(role)
         if payload.emoji.name == '📈':
             role = discord.utils.get(guild.roles, name="Occupied")
             member = payload.member
-
             if member is not None:
                 await member.add_roles(role)
         if payload.emoji.name == '🍿':
             role = discord.utils.get(guild.roles, name="Crowd")
             member = payload.member
-
             if member is not None:
                 await member.add_roles(role)
     emoji = payload.emoji
@@ -372,5 +357,4 @@ async def balance(ctx):
 keep_alive()
 client.run(os.getenv('TOKEN'))
 
-## Fred from HR is a little discord bot by idislikebrian#4281
-## **Add to your server**: Coming soon...
+## Fred from HR is a little discord bot by chamaquito#4281
