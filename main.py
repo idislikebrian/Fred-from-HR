@@ -13,6 +13,7 @@ from cogs.finance import FinanceCog
 from cogs.ceelo import CeeloCog
 from cogs.media import MediaCog
 from cogs.fun import FunCog
+from cogs.reaction_roles import ReactionRolesCog
 
 from utils import notFriends
 
@@ -89,12 +90,13 @@ async def on_ready():
   client.add_cog(CeeloCog(client))
   client.add_cog(MediaCog(client))
   client.add_cog(FunCog(client))
+  client.add_cog(ReactionRolesCog(client))
   await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/18"), afk=False)
 
 @client.event
 async def on_member_join(member):
     print(f'{member} has joined the server.')
-    time.sleep(15)
+    time.sleep(60)
     await member.send("**Welcome to WORKSHOP!** I'm Fred... From HR. Here are some housekeeping items to get started:\n "
                         "\n 1. Don't forget to send a `-verify {@your-username}` message in the <#758754067173343254> channel to access the rest of ther server! (this is a spam-prevention measure)"
                         "\n 2. Introduce yourself over in <#708440927596970014>."
@@ -107,40 +109,6 @@ async def on_member_join(member):
 @client.event
 async def on_member_remove(member):
     print(f'{member} has left the server.')
-
-@client.event
-async def on_raw_reaction_add(payload):
-    message = payload.message_id
-    if message == 808727603808174121:
-        guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
-        if payload.emoji.name == '🎮':
-            role = discord.utils.get(guild.roles, name="Playfellow")
-            member = payload.member
-            if member is not None:
-                await member.add_roles(role)
-        if payload.emoji.name == '📈':
-            role = discord.utils.get(guild.roles, name="Occupied")
-            member = payload.member
-            if member is not None:
-                await member.add_roles(role)
-        if payload.emoji.name == '🍿':
-            role = discord.utils.get(guild.roles, name="Crowd")
-            member = payload.member
-            if member is not None:
-                await member.add_roles(role)
-    emoji = payload.emoji
-    channel = payload.channel_id
-    if channel == 709454636070862868: ## here i change the actual channel where the jobs post
-        channel1 = client.get_channel(channel)
-        msg = await channel1.fetch_message(message)
-        d = str(msg.embeds[0].fields[1].value)
-        t = d[:-1]
-        d = int(t[2:])
-        user = client.get_user(d)
-        member = payload.member
-        memberMention = member.mention
-        await user.send("{} has reacted with {}! ".format(memberMention, emoji) + "Send them a DM.")
 
 @client.command()
 async def ping(ctx):
