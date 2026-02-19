@@ -91,7 +91,7 @@ async def on_ready():
   client.add_cog(MediaCog(client))
   client.add_cog(FunCog(client))
   client.add_cog(ReactionRolesCog(client))
-  await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/18"), afk=False)
+  await client.change_presence(status=discord.Status.online, activity=discord.Game("with fire | -help | last update: 2023/04/21"), afk=False)
 
 @client.event
 async def on_member_join(member):
