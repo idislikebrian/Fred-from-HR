@@ -5,6 +5,12 @@
 - `verify`: Verify a user in the verification channel.
 - `daily`: Claim daily rewards (1,000 🧧).
 - `balance`: Check your current currency balance.
+- `art`: Show a random artwork from The Met collection.
+- `flip`: Flip a coin or make a quick yes/no call.
+- `hug`: Send a hug GIF to another user.
+- `magic8`: Ask the Magic 8 Ball a question.
+- `roll`: Roll dice and other simple random values.
+- `roulette`: Play a roulette-style chance game.
 
 ## Legacy Commands (Python - Pending Migration)
 - `gig`: Post a job listing to the classifieds channel.
@@ -23,6 +29,8 @@
 ## Project Structure
 - `src/index.js`: Main entry point and event handlers.
 - `src/commands/`: Individual command modules.
+- `test/`: Node test coverage for command behavior.
+- `package.json`: Runtime and test scripts.
 - `src/database/db.js`: SQLite database interface.
 - `src/utils/constants.js`: Static data and strings.
 - `bot_data.db`: SQLite database file.
