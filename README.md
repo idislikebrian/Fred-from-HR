@@ -22,10 +22,50 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - Fred sends a welcome DM when a member joins the server.
 - Reaction-role behavior is not present as a command in the current JavaScript source.
 
+## Roadmap — 2026-08-06
+
+> This roadmap records the state of Fred’s JavaScript migration and the agreed next steps as of August 6, 2026.
+
+### Restore from the legacy Python bot
+
+- [ ] `weekly` — restore the weekly economy reward
+- [ ] `handshake` — restore the social handshake command
+- [ ] `sacrifice` — restore the Spaghetti Monster command
+- [ ] `match` — restore compatibility matching
+- [ ] `deathmatch` — restore the competitive social command
+- [ ] `book` — rebuild using a maintained public books API
+- [ ] `movie` — rebuild using a maintained movie API
+- [ ] `crypto` — rebuild after selecting a maintained market-data API
+- [ ] `ticker` — rebuild after selecting a maintained stock-market API
+
+### Retired
+
+- [x] `gig` — intentionally retired; do not migrate
+
+### Owned by Principal
+
+- [x] `memo` — administrative memo functionality belongs to The Principal
+
+### Redesign later
+
+- [ ] Role assignment system — do not directly port the old hardcoded reaction-role implementation
+  - evaluate buttons or select menus
+  - keep configuration/admin controls with The Principal
+  - let Fred present member-facing role selection where appropriate
+
+### Maintenance
+
+- [ ] Archive the legacy Python implementation under `legacy/python/`
+- [ ] Remove tracked Python cache and Replit artifact files
+- [ ] Review, rotate, and remove credentials from `uploader.cfg`
+- [ ] Mark archived Python as vendored for GitHub Linguist
+- [ ] Add a generated `-help` command
+- [ ] Centralize verified-member permission checks
+- [ ] Restore normal PM2 CLI management
+
 ## Project Structure
 
 - `src/index.js` — Main entry point and command/event wiring.
 - `src/commands/` — Individual command modules.
 - `test/` — Node test coverage for command behavior.
 - `package.json` — Runtime and test scripts.
-
