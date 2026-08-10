@@ -4,6 +4,8 @@ Fred is a Discord bot with prefix commands that use `-`.
 
 Runtime data, `.env`, and installed dependencies are local-only and are not committed as project source.
 
+**Process management:** this bot is supervised by the systemd-managed PM2 daemon (`pm2-root.service`), alongside `theprincipal` and `jowcm-hotline`. Before running any `pm2` command against it, read `/root/AGENTS.md` — the interactive `pm2` CLI on this box has a known split-brain trap that makes `pm2 list`/`restart`/`stop` silently lie about what's running. (This is also the "Restore normal PM2 CLI management" item in the Maintenance roadmap below — `/root/AGENTS.md` documents the current broken state in detail.)
+
 ## Commands
 
 - `-ping` — Basic connectivity check.
