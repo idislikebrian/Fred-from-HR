@@ -17,6 +17,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - `-balance` — Check your current currency balance.
 - `-art [search terms]` — Fetch a random artwork from The Met collection. Requires the `VERIFIED` role or `Administrator`. If no search terms are provided, Fred uses a built-in art query.
 - `-flip [heads|tails]` — Flip a coin. Aliases: `-coin`, `-coinflip`. You can also mention a user to direct the result.
+- `-handshake @user` — Send a handshake GIF to a mentioned member. Requires the `VERIFIED` role or `Administrator`.
 - `-hug @user` — Send a hug GIF to a mentioned member.
 - `-magic8 question...` — Ask the Magic 8 Ball a question.
 - `-roll` — Start a Cee-lo game in `<#814947576297160746>`. Players join by reacting with 🎲 during the countdown.
@@ -26,6 +27,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 
 - Fred sends a welcome DM when a member joins the server.
 - Reaction-role behavior is not present as a command in the current JavaScript source.
+- Member-facing command access (Administrator or exact `VERIFIED` role) is centralized in [`src/utils/memberAccess.js`](src/utils/memberAccess.js). This still reflects the legacy bot-managed verification role; it is expected to change when Workshop moves to Discord-native Rules Screening, which has not happened yet.
 
 ## Roadmap — 2026-08-06
 
@@ -34,7 +36,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 ### Restore from the legacy Python bot
 
 - [x] `weekly` — restored; see Commands above
-- [ ] `handshake` — restore the social handshake command
+- [x] `handshake` — restored; see Commands above
 - [ ] `sacrifice` — restore the Spaghetti Monster command
 - [ ] `match` — restore compatibility matching
 - [ ] `deathmatch` — restore the competitive social command
@@ -65,7 +67,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - [x] `uploader.cfg` removed from Git tracking (unused, unreferenced by any current code — see `legacy/python/README.md` history). A forensic copy is retained outside the repo with restrictive permissions. **Manual step still required:** rotate/revoke the imgur credential this file held, since an OAuth refresh token does not expire on its own.
 - [x] Mark archived Python as vendored for GitHub Linguist
 - [ ] Add a generated `-help` command
-- [ ] Centralize verified-member permission checks
+- [x] Centralize verified-member permission checks — see `src/utils/memberAccess.js`
 - [ ] Restore normal PM2 CLI management
 
 ## Project Structure
