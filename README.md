@@ -20,6 +20,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - `-handshake @user` — Send a handshake GIF to a mentioned member. Requires the `VERIFIED` role or `Administrator`.
 - `-hug @user` — Send a hug GIF to a mentioned member.
 - `-magic8 question...` — Ask the Magic 8 Ball a question.
+- `-match @user` — Gauge the love between you and a mentioned member. Requires the `VERIFIED` role or `Administrator`.
 - `-roll` — Start a Cee-lo game in `<#814947576297160746>`. Players join by reacting with 🎲 during the countdown.
 - `-roulette` — Play a roulette-style chance game.
 - `-sacrifice @user` — Sacrifice a mentioned member to a random cause. Requires the `VERIFIED` role or `Administrator`.
@@ -39,7 +40,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - [x] `weekly` — restored; see Commands above
 - [x] `handshake` — restored; see Commands above
 - [x] `sacrifice` — restored; see Commands above
-- [ ] `match` — restore compatibility matching
+- [x] `match` — restored; see Commands above
 - [ ] `deathmatch` — restore the competitive social command
 - [ ] `book` — rebuild using a maintained public books API
 - [ ] `movie` — rebuild using a maintained movie API
