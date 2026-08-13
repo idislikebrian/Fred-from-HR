@@ -13,3 +13,6 @@ npm-debug.log*
 .cache/
 __pycache__/
 *.pyc
+
+# Orphaned credential file, unused by current code (see README Maintenance section)
+uploader.cfg
