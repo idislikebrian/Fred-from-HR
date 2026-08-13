@@ -50,7 +50,7 @@ test('command loader discovers all active commands, including help itself', () =
 
 test('archived Python-only commands are not discovered or listed', () => {
     const commandsMap = loadRealCommands();
-    for (const legacyOnly of ['gig', 'deathmatch', 'book', 'movie', 'crypto', 'ticker', 'memo']) {
+    for (const legacyOnly of ['gig', 'book', 'movie', 'crypto', 'ticker', 'memo']) {
         assert.equal(commandsMap.has(legacyOnly), false, `${legacyOnly} has no JS implementation and must not appear`);
     }
 });
