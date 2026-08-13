@@ -7,6 +7,10 @@ const rouletteGIFs = [
 
 module.exports = {
     name: 'roulette',
+    aliases: [],
+    usage: '-roulette',
+    description: 'Play a roulette-style chance game.',
+    access: 'public',
     async execute(message, args, client) {
         const loadingEmbed = new EmbedBuilder()
             .setTitle(' ')

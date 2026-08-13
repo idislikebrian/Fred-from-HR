@@ -3,7 +3,10 @@ const { getBalance, updateBalance, getLastClaim, updateLastClaim } = require('..
 
 module.exports = {
     name: 'daily',
-    description: 'Claim daily reward',
+    aliases: [],
+    usage: '-daily',
+    description: 'Claim the daily reward.',
+    access: 'public',
     async execute(message, args) {
         const userId = message.author.id;
         const lastClaim = await getLastClaim(userId, 'last_daily_claim');

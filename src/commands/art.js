@@ -105,7 +105,10 @@ function buildArtworkEmbed(artwork) {
 
 module.exports = {
     name: 'art',
+    aliases: [],
+    usage: '-art [search terms]',
     description: 'Fetch a random piece of art from the Met Museum collection',
+    access: 'member',
     async execute(message, args, client) {
         if (!message.guild || !message.member) return;
 

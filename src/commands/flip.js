@@ -1,6 +1,9 @@
 module.exports = {
     name: 'flip',
     aliases: ['coin', 'coinflip'],
+    usage: '-flip [heads|tails] [@user]',
+    description: 'Flip a coin. Optionally predict heads or tails, or mention someone to direct the result at them.',
+    access: 'public',
     execute(message, args, client) {
         const coinSides = ['heads', 'tails'];
         const result = coinSides[Math.floor(Math.random() * coinSides.length)];

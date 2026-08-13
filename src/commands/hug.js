@@ -2,6 +2,10 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'hug',
+    aliases: [],
+    usage: '-hug @user',
+    description: 'Send a hug GIF to a mentioned member.',
+    access: 'public',
     async execute(message, args, client) {
         const mentionedUser = message.mentions.members.first();
         

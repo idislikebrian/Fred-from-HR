@@ -21,6 +21,10 @@ function ceeLoOutcome(roll) {
 
 module.exports = {
     name: 'roll',
+    aliases: [],
+    usage: '-roll',
+    description: 'Start a Cee-lo dice game in the designated channel.',
+    access: 'public',
     async execute(message, args, client) {
         const allowedChannelId = '814947576297160746';
         

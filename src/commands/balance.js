@@ -3,7 +3,10 @@ const { getBalance } = require('../database/db');
 
 module.exports = {
     name: 'balance',
-    description: 'Check your balance',
+    aliases: [],
+    usage: '-balance',
+    description: 'Check your current currency balance.',
+    access: 'public',
     async execute(message, args) {
         const userId = message.author.id;
         const balance = await getBalance(userId);

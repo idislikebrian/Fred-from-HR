@@ -59,7 +59,10 @@ function buildCooldownEmbed(nextClaimAt, now) {
 
 module.exports = {
     name: 'weekly',
+    aliases: [],
+    usage: '-weekly',
     description: 'Claim your weekly 10,000 🧧 reward',
+    access: 'member',
     async execute(message, args) {
         if (!message.guild || !message.member) return;
 

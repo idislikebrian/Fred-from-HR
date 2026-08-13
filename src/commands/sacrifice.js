@@ -24,7 +24,10 @@ function buildSacrificeEmbed(author, target) {
 
 module.exports = {
     name: 'sacrifice',
+    aliases: [],
+    usage: '-sacrifice @user',
     description: 'Sacrifice another member to a random cause',
+    access: 'member',
     async execute(message, args) {
         if (!message.guild || !message.member) return;
 

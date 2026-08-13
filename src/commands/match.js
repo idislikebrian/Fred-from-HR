@@ -29,7 +29,10 @@ function buildMatchMessage(author, target, result) {
 
 module.exports = {
     name: 'match',
+    aliases: [],
+    usage: '-match @user',
     description: "Gauge the love between you and another member",
+    access: 'member',
     async execute(message, args) {
         if (!message.guild || !message.member) return;
 

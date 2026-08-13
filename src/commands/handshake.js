@@ -24,7 +24,10 @@ function buildHandshakeEmbed(author, target) {
 
 module.exports = {
     name: 'handshake',
+    aliases: [],
+    usage: '-handshake @user',
     description: 'Shake hands with another member',
+    access: 'member',
     async execute(message, args) {
         if (!message.guild || !message.member) return;
 

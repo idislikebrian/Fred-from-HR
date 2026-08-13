@@ -11,6 +11,10 @@ const magicalAnswers = [
 
 module.exports = {
     name: 'magic8',
+    aliases: [],
+    usage: '-magic8 <question>',
+    description: 'Ask the Magic 8 Ball a question.',
+    access: 'public',
     async execute(message, args, client) {
         const inquiry = args.join(' ');
         

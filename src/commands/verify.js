@@ -2,7 +2,10 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'verify',
-    description: 'Verify a member',
+    aliases: [],
+    usage: '-verify @user',
+    description: 'Verify a mentioned member. Use this in the verification channel.',
+    access: 'verification',
     async execute(message, args) {
         const member = message.mentions.members.first();
         if (!member) {

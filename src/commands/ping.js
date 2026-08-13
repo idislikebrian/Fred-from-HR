@@ -1,6 +1,9 @@
 module.exports = {
     name: 'ping',
-    description: 'Ping command',
+    aliases: [],
+    usage: '-ping',
+    description: 'Basic connectivity check.',
+    access: 'public',
     async execute(message, args) {
         await message.channel.send("To that, I say pong!");
     }
