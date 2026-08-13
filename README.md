@@ -13,6 +13,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - `-ping` — Basic connectivity check.
 - `-verify @user` — Verify a mentioned member. Use this in the `🤝・verification` channel.
 - `-daily` — Claim the daily reward.
+- `-weekly` — Claim Fred's weekly 10,000 🧧 reward. Requires the `VERIFIED` role or `Administrator`.
 - `-balance` — Check your current currency balance.
 - `-art [search terms]` — Fetch a random artwork from The Met collection. Requires the `VERIFIED` role or `Administrator`. If no search terms are provided, Fred uses a built-in art query.
 - `-flip [heads|tails]` — Flip a coin. Aliases: `-coin`, `-coinflip`. You can also mention a user to direct the result.
@@ -32,7 +33,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 
 ### Restore from the legacy Python bot
 
-- [ ] `weekly` — restore the weekly economy reward
+- [x] `weekly` — restored; see Commands above
 - [ ] `handshake` — restore the social handshake command
 - [ ] `sacrifice` — restore the Spaghetti Monster command
 - [ ] `match` — restore compatibility matching
