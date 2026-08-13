@@ -71,6 +71,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - [x] Mark archived Python as vendored for GitHub Linguist
 - [x] Add a generated `-help` command — see `src/commands/help.js`
 - [x] Centralize verified-member permission checks — see `src/utils/memberAccess.js`
+- [x] Fix command dispatch to honor declared aliases (`-coin`/`-coinflip` previously did nothing) — see `src/utils/commandRegistry.js`
 - [ ] Restore normal PM2 CLI management
 
 ## Project Structure
