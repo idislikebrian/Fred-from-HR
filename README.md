@@ -11,6 +11,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 ## Commands
 
 - `-ping` — Basic connectivity check.
+- `-help [command]` — List available commands, or show usage/access details for one command. Generated from each command module's own metadata, so it always reflects what's actually loaded.
 - `-verify @user` — Verify a mentioned member. Use this in the `🤝・verification` channel.
 - `-daily` — Claim the daily reward.
 - `-weekly` — Claim Fred's weekly 10,000 🧧 reward. Requires the `VERIFIED` role or `Administrator`.
@@ -68,7 +69,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - [x] Remove tracked Python cache and Replit artifact files
 - [x] `uploader.cfg` removed from Git tracking (unused, unreferenced by any current code — see `legacy/python/README.md` history). A forensic copy is retained outside the repo with restrictive permissions. **Manual step still required:** rotate/revoke the imgur credential this file held, since an OAuth refresh token does not expire on its own.
 - [x] Mark archived Python as vendored for GitHub Linguist
-- [ ] Add a generated `-help` command
+- [x] Add a generated `-help` command — see `src/commands/help.js`
 - [x] Centralize verified-member permission checks — see `src/utils/memberAccess.js`
 - [ ] Restore normal PM2 CLI management
 
