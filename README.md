@@ -2,6 +2,8 @@
 
 Fred is a Discord bot with prefix commands that use `-`.
 
+**Production runs on JavaScript only.** The entry point is [`src/index.js`](src/index.js) (Node.js / discord.js), started by PM2. The original Python (`discord.py`) implementation is archived for historical reference under [`legacy/python/`](legacy/python/) and is not executed in production — see that directory's README before restoring any command from it. Historical Replit deployment configuration is archived under [`legacy/replit/`](legacy/replit/); current production does not use Replit.
+
 Runtime data, `.env`, and installed dependencies are local-only and are not committed as project source.
 
 **Process management:** this bot is supervised by the systemd-managed PM2 daemon (`pm2-root.service`), alongside `theprincipal` and `jowcm-hotline`. Before running any `pm2` command against it, read `/root/AGENTS.md` — the interactive `pm2` CLI on this box has a known split-brain trap that makes `pm2 list`/`restart`/`stop` silently lie about what's running. (This is also the "Restore normal PM2 CLI management" item in the Maintenance roadmap below — `/root/AGENTS.md` documents the current broken state in detail.)
@@ -57,10 +59,10 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 
 ### Maintenance
 
-- [ ] Archive the legacy Python implementation under `legacy/python/`
-- [ ] Remove tracked Python cache and Replit artifact files
-- [ ] Review, rotate, and remove credentials from `uploader.cfg`
-- [ ] Mark archived Python as vendored for GitHub Linguist
+- [x] Archive the legacy Python implementation under `legacy/python/`
+- [x] Remove tracked Python cache and Replit artifact files
+- [x] `uploader.cfg` removed from Git tracking (unused, unreferenced by any current code — see `legacy/python/README.md` history). A forensic copy is retained outside the repo with restrictive permissions. **Manual step still required:** rotate/revoke the imgur credential this file held, since an OAuth refresh token does not expire on its own.
+- [x] Mark archived Python as vendored for GitHub Linguist
 - [ ] Add a generated `-help` command
 - [ ] Centralize verified-member permission checks
 - [ ] Restore normal PM2 CLI management
@@ -71,3 +73,5 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - `src/commands/` — Individual command modules.
 - `test/` — Node test coverage for command behavior.
 - `package.json` — Runtime and test scripts.
+- `legacy/python/` — Archived Python (`discord.py`) implementation. Historical reference only; not used in production.
+- `legacy/replit/` — Archived Replit deployment configuration. Historical reference only; not used in production.
