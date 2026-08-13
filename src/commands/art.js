@@ -1,7 +1,7 @@
-const { EmbedBuilder, PermissionsBitField } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const axios = require('axios');
+const { canUseMemberCommand, ACCESS_DENIED_MESSAGE } = require('../utils/memberAccess');
 
-const VERIFIED_ROLE_NAME = 'VERIFIED';
 const REQUEST_TIMEOUT_MS = 8000;
 const MAX_OBJECTS_TO_INSPECT = 10;
 const COOLDOWN_MS = 10000;
@@ -109,11 +109,8 @@ module.exports = {
     async execute(message, args, client) {
         if (!message.guild || !message.member) return;
 
-        const isAdmin = message.member.permissions.has(PermissionsBitField.Flags.Administrator);
-        const isVerified = message.member.roles.cache.some(role => role.name === VERIFIED_ROLE_NAME);
-
-        if (!isAdmin && !isVerified) {
-            await message.channel.send(`${message.author}, you need to be verified to use this command.`).catch(() => {});
+        if (!canUseMemberCommand(message.member)) {
+            await message.channel.send(`${message.author}, ${ACCESS_DENIED_MESSAGE}`).catch(() => {});
             return;
         }
 

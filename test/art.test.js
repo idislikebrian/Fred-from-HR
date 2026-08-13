@@ -1,7 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { _internal } = require('../src/commands/art.js');
+const art = require('../src/commands/art.js');
+const { _internal } = art;
 const { truncate, shuffle, isSuitableArtwork, buildArtworkEmbed, defaultQueries } = _internal;
+const { ACCESS_DENIED_MESSAGE } = require('../src/utils/memberAccess');
 
 test('truncate leaves short strings untouched', () => {
     assert.equal(truncate('hello', 10), 'hello');
@@ -75,4 +77,25 @@ test('defaultQueries is a small curated, non-empty list of strings', () => {
         assert.equal(typeof q, 'string');
         assert.ok(q.length > 0);
     }
+});
+
+// Regression coverage: art.js was migrated from an inline admin/VERIFIED check
+// to the shared memberAccess helper. This must not change who is denied, what
+// they're told, or that a denial short-circuits before any Met API call.
+test('unverified non-admin is still denied with the shared access message, before any network call', async () => {
+    const sent = [];
+    const message = {
+        guild: {},
+        member: {
+            permissions: { has: () => false },
+            roles: { cache: [] }
+        },
+        author: { toString: () => '<@denied-user>' },
+        channel: { send: async (payload) => { sent.push(payload); return payload; } }
+    };
+
+    await art.execute(message, []);
+
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0], `<@denied-user>, ${ACCESS_DENIED_MESSAGE}`);
 });

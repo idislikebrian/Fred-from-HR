@@ -1,15 +1,9 @@
-const { EmbedBuilder, PermissionsBitField } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { getBalance, updateBalance, getLastClaim, updateLastClaim } = require('../database/db');
+const { canUseMemberCommand, ACCESS_DENIED_MESSAGE } = require('../utils/memberAccess');
 
-const VERIFIED_ROLE_NAME = 'VERIFIED';
 const WEEKLY_REWARD = 10000;
 const WEEKLY_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000; // fixed 7-day window, matching the legacy Python command
-
-function isAuthorized(member) {
-    const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator);
-    const isVerified = member.roles.cache.some(role => role.name === VERIFIED_ROLE_NAME);
-    return isAdmin || isVerified;
-}
 
 // Stored claim timestamps are full ISO-8601 with a trailing "Z", so re-parsing with
 // `new Date(...)` is unambiguously UTC regardless of the server's local timezone.
@@ -69,8 +63,8 @@ module.exports = {
     async execute(message, args) {
         if (!message.guild || !message.member) return;
 
-        if (!isAuthorized(message.member)) {
-            await message.channel.send(`${message.author}, you need to be verified to use this command.`).catch(() => {});
+        if (!canUseMemberCommand(message.member)) {
+            await message.channel.send(`${message.author}, ${ACCESS_DENIED_MESSAGE}`).catch(() => {});
             return;
         }
 
@@ -93,7 +87,6 @@ module.exports = {
         await message.channel.send({ embeds: [buildClaimedEmbed(newBalance, nextClaimAt)] });
     },
     _internal: {
-        isAuthorized,
         isOnCooldown,
         getNextClaimTime,
         formatDisplayTimestamp,

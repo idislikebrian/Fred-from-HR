@@ -12,7 +12,7 @@ process.env.BOT_DB_PATH = path.join(tmpDir, 'test.db');
 const { getBalance, getLastClaim, updateLastClaim } = require('../src/database/db');
 const weekly = require('../src/commands/weekly.js');
 const { _internal } = weekly;
-const { isAuthorized, isOnCooldown, getNextClaimTime, formatDuration, WEEKLY_REWARD, WEEKLY_COOLDOWN_MS } = _internal;
+const { isOnCooldown, getNextClaimTime, formatDuration, WEEKLY_REWARD, WEEKLY_COOLDOWN_MS } = _internal;
 
 test.after(() => {
     fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -152,17 +152,9 @@ test('daily claim does not interfere with weekly eligibility', async () => {
     assert.equal(await getBalance(userId), 10000);
 });
 
-test('isAuthorized: admin without VERIFIED role is authorized', () => {
-    assert.equal(isAuthorized(makeMember({ isAdmin: true })), true);
-});
-
-test('isAuthorized: verified non-admin is authorized', () => {
-    assert.equal(isAuthorized(makeMember({ isVerified: true })), true);
-});
-
-test('isAuthorized: neither admin nor verified is denied', () => {
-    assert.equal(isAuthorized(makeMember({})), false);
-});
+// Permission gating itself (admin/VERIFIED/neither) is covered by the shared
+// helper's own tests in test/memberAccess.test.js — weekly.js just delegates
+// to it now. The tests below only confirm weekly's *use* of that decision.
 
 test('isOnCooldown / getNextClaimTime use a fixed 7-day window', () => {
     const now = new Date('2026-08-12T00:00:00.000Z');
