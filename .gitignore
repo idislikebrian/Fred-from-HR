@@ -5,4 +5,11 @@ bot_data.db
 *.db-wal
 *.db-shm
 npm-debug.log*
+*.log
 .DS_Store
+
+# Python / Replit generated artifacts (legacy, not part of the JS runtime)
+.breakpoints
+.cache/
+__pycache__/
+*.pyc
