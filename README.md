@@ -22,6 +22,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - `-magic8 question...` — Ask the Magic 8 Ball a question.
 - `-roll` — Start a Cee-lo game in `<#814947576297160746>`. Players join by reacting with 🎲 during the countdown.
 - `-roulette` — Play a roulette-style chance game.
+- `-sacrifice @user` — Sacrifice a mentioned member to a random cause. Requires the `VERIFIED` role or `Administrator`.
 
 ## Other bot behavior
 
@@ -37,7 +38,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 
 - [x] `weekly` — restored; see Commands above
 - [x] `handshake` — restored; see Commands above
-- [ ] `sacrifice` — restore the Spaghetti Monster command
+- [x] `sacrifice` — restored; see Commands above
 - [ ] `match` — restore compatibility matching
 - [ ] `deathmatch` — restore the competitive social command
 - [ ] `book` — rebuild using a maintained public books API
