@@ -3,6 +3,7 @@ const { Client, GatewayIntentBits, Partials, Collection, ActivityType, EmbedBuil
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const { buildCommandRegistry } = require('./utils/commandRegistry');
 
 const client = new Client({
     intents: [
@@ -25,10 +26,14 @@ app.listen(5000, () => console.log('Keep-alive server running on port 5000'));
 
 // Command Handler
 const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
+const loadedCommands = commandFiles.map(file => require(`./commands/${file}`));
+for (const command of loadedCommands) {
     client.commands.set(command.name, command);
 }
+
+// Separate name+alias -> command lookup for dispatch. client.commands above stays
+// canonical-name-only so -help continues listing each command exactly once.
+const commandRegistry = buildCommandRegistry(loadedCommands);
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -44,7 +49,7 @@ client.on('messageCreate', async message => {
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
 
-    const command = client.commands.get(commandName);
+    const command = commandRegistry.get(commandName);
     if (!command) return;
 
     try {
