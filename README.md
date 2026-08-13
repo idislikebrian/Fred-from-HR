@@ -14,6 +14,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - `-help [command]` — List available commands, or show usage/access details for one command. Generated from each command module's own metadata, so it always reflects what's actually loaded.
 - `-verify @user` — Verify a mentioned member. Use this in the `🤝・verification` channel.
 - `-daily` — Claim the daily reward.
+- `-deathmatch @user` — Challenge a mentioned member to a deathmatch trial. Requires the `VERIFIED` role or `Administrator`.
 - `-weekly` — Claim Fred's weekly 10,000 🧧 reward. Requires the `VERIFIED` role or `Administrator`.
 - `-balance` — Check your current currency balance.
 - `-art [search terms]` — Fetch a random artwork from The Met collection. Requires the `VERIFIED` role or `Administrator`. If no search terms are provided, Fred uses a built-in art query.
@@ -42,7 +43,7 @@ Runtime data, `.env`, and installed dependencies are local-only and are not comm
 - [x] `handshake` — restored; see Commands above
 - [x] `sacrifice` — restored; see Commands above
 - [x] `match` — restored; see Commands above
-- [ ] `deathmatch` — restore the competitive social command
+- [x] `deathmatch` — restored; see Commands above
 - [ ] `book` — rebuild using a maintained public books API
 - [ ] `movie` — rebuild using a maintained movie API
 - [ ] `crypto` — rebuild after selecting a maintained market-data API
